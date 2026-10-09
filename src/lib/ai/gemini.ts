@@ -136,9 +136,12 @@ export async function generateArchitecture(requirementsJson: string) {
     });
 
     let text = response.text || "";
-    // Clean up if it outputs markdown ticks
-    text = text.replace(/^\\s*\\\`\\\`\\\`(mermaid)?/im, "").replace(/\\\`\\\`\\\`\\s*$/im, "").trim();
-    return text;
+    // Extract content between ```mermaid and ``` if it exists
+    const match = text.match(/```(?:mermaid)?\s*([\s\S]*?)```/);
+    if (match) {
+      text = match[1];
+    }
+    return text.trim();
   } catch (error: any) {
     if (error?.message?.includes("503") || error?.status === 503 || error?.message?.includes("UNAVAILABLE")) {
       return `graph TD
