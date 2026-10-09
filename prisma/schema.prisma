@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  srsDocuments        SrsDocument[]
+  requirements        Requirement[]
+  validationReports   ValidationReport[]
+  architectureModels  ArchitectureModel[]
+  testCases           TestCase[]
+  estimates           Estimate[]
+  chatSessions        ChatSession[]
+  conflicts           Conflict[]
+}
+
+model SrsDocument {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  version   Int      @default(1)
+  content   String?  // Extracted text
+  fileUrl   String?  // If stored in storage
+  createdAt DateTime @default(now())
+
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirements Requirement[]
+}
+
+model Requirement {
+  id                 String   @id @default(uuid())
+  projectId          String
+  srsDocumentId      String
+  reqId              String   // E.g. "FR-001"
+  text               String
+  type               String
+  priority           String
+  actor              String?
+  sourceSection      String?
+  ambiguityScore     Int      @default(0)
+  completenessScore  Int      @default(0)
+  testabilityScore   Int      @default(0)
+  consistencyScore   Int      @default(0)
+  riskLevel          String   @default("Low")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  srsDocument SrsDocument @relation(fields: [srsDocumentId], references: [id], onDelete: Cascade)
+
+  testCases      TestCase[]
+  sourceForLinks TraceabilityLink[] @relation("SourceRequirement")
+  targetForLinks TraceabilityLink[] @relation("TargetRequirement")
+  conflictsA     Conflict[]         @relation("ConflictRequirementA")
+  conflictsB     Conflict[]         @relation("ConflictRequirementB")
+}
+
+model TraceabilityLink {
+  id        String   @id @default(uuid())
+  sourceId  String
+  targetId  String
+  type      String   // E.g. "DEPENDS_ON", "CONFLICTS_WITH"
+  createdAt DateTime @default(now())
+
+  source Requirement @relation("SourceRequirement", fields: [sourceId], references: [id], onDelete: Cascade)
+  target Requirement @relation("TargetRequirement", fields: [targetId], references: [id], onDelete: Cascade)
+}
+
+model ValidationReport {
+  id          String   @id @default(uuid())
+  projectId   String
+  overallScore Int
+  completeness Int
+  consistency  Int
+  unambiguity  Int
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ArchitectureModel {
+  id          String   @id @default(uuid())
+  projectId   String
+  type        String   // e.g., "SYSTEM", "UML_CLASS", "ER_DIAGRAM"
+  content     String   // Mermaid or JSON representation
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model TestCase {
+  id             String   @id @default(uuid())
+  projectId      String
+  requirementId  String
+  testCaseId     String   // E.g. "TC-001"
+  title          String
+  preconditions  String
+  steps          String
+  expectedResult String
+  priority       String
+  type           String
+  createdAt      DateTime @default(now())
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+}
+
+model Estimate {
+  id            String   @id @default(uuid())
+  projectId     String
+  developerHours Int
+  qaHours       Int
+  designHours   Int
+  devopsHours   Int
+  architectureHours Int
+  totalHours    Int
+  createdAt     DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ChatSession {
+  id        String   @id @default(uuid())
+  projectId String
+  createdAt DateTime @default(now())
+
+  project  Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id            String   @id @default(uuid())
+  chatSessionId String
+  role          String   // "user" or "assistant"
+  content       String
+  createdAt     DateTime @default(now())
+
+  chatSession ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+}
+
+model Conflict {
+  id             String   @id @default(uuid())
+  projectId      String
+  requirementAId String
+  requirementBId String
+  severity       String
+  reason         String
+  recommendation String
+  createdAt      DateTime @default(now())
+
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirementA Requirement @relation("ConflictRequirementA", fields: [requirementAId], references: [id], onDelete: Cascade)
+  requirementB Requirement @relation("ConflictRequirementB", fields: [requirementBId], references: [id], onDelete: Cascade)
+}
