@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { BrainCircuit } from 'lucide-react'
+import { registerWithEmail } from '@/app/actions/auth'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -22,11 +23,14 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
     
-    // Bypass Supabase Auth completely to avoid Email Verification locks
-    setTimeout(() => {
+    try {
+      await registerWithEmail(email, name)
       router.push('/dashboard')
       router.refresh()
-    }, 500)
+    } catch (err: any) {
+      setError(err.message || 'Failed to register. Please try again.')
+      setLoading(false)
+    }
   }
 
   return (
