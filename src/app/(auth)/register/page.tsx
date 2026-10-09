@@ -24,7 +24,12 @@ export default function RegisterPage() {
     setError(null)
     
     try {
-      await registerWithEmail(email, name)
+      const res = await registerWithEmail(email, name)
+      if (res?.error) {
+        setError(res.error)
+        setLoading(false)
+        return
+      }
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {

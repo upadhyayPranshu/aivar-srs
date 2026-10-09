@@ -5,7 +5,7 @@ import prisma from '@/lib/db/prisma'
 export async function loginWithEmail(email: string) {
   const dbUser = await prisma.user.findUnique({ where: { email } })
   if (!dbUser) {
-    throw new Error("Account not found. Please sign up first.")
+    return { error: "Account not found. Please sign up first." }
   }
   
   const cookieStore = await cookies();
@@ -16,7 +16,7 @@ export async function loginWithEmail(email: string) {
 export async function registerWithEmail(email: string, name: string) {
   let dbUser = await prisma.user.findUnique({ where: { email } })
   if (dbUser) {
-    throw new Error("An account with this email already exists.")
+    return { error: "An account with this email already exists." }
   }
   
   await prisma.user.create({ data: { email, name } })

@@ -23,7 +23,12 @@ export default function LoginPage() {
     setError(null)
     
     try {
-      await loginWithEmail(email)
+      const res = await loginWithEmail(email)
+      if (res?.error) {
+        setError(res.error)
+        setLoading(false)
+        return
+      }
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
