@@ -3,6 +3,9 @@ import { BrainCircuit, LayoutDashboard, FolderKanban, FileText, ListTodo, Shield
 import LogoutButton from "@/components/LogoutButton"
 import { cookies } from "next/headers"
 
+export const dynamic = "force-dynamic"
+export const instant = false
+
 export default async function DashboardLayout({
   children,
 }: {
