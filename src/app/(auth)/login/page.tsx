@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 import { BrainCircuit } from 'lucide-react'
+import { loginWithEmail } from '@/app/actions/auth'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('demo@aivar.test')
@@ -21,11 +22,14 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     
-    // Bypass Supabase Auth completely to avoid Email Verification locks
-    setTimeout(() => {
+    try {
+      await loginWithEmail(email)
       router.push('/dashboard')
       router.refresh()
-    }, 500)
+    } catch (err) {
+      setError('Failed to login. Please try again.')
+      setLoading(false)
+    }
   }
 
   return (

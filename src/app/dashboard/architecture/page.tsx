@@ -1,9 +1,14 @@
+import { cookies } from 'next/headers';
 import prisma from "@/lib/db/prisma"
 import MermaidDiagram from "@/components/architecture/MermaidDiagram"
 export const instant = false
 
 export default async function ArchitecturePage() {
+  const cookieStore = await cookies();
+  const userEmail = cookieStore.get('aivar_user_email')?.value || 'auto@aivar.test';
+
   const project = await prisma.project.findFirst({
+    where: { user: { email: userEmail } },
     include: {
       architectureModels: true
     },

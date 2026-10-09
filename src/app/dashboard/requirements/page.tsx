@@ -1,10 +1,15 @@
+import { cookies } from 'next/headers';
 import prisma from "@/lib/db/prisma"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 export const instant = false
 
 export default async function RequirementsPage() {
+  const cookieStore = await cookies();
+  const userEmail = cookieStore.get('aivar_user_email')?.value || 'auto@aivar.test';
+
   const project = await prisma.project.findFirst({
+    where: { user: { email: userEmail } },
     include: {
       requirements: {
         orderBy: {

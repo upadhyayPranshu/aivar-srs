@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ClipboardCheck, BrainCircuit, Activity } from "lucide-react"
 import prisma from "@/lib/db/prisma"
@@ -5,7 +6,11 @@ import prisma from "@/lib/db/prisma"
 export const instant = false
 
 export default async function TestCasesPage() {
+  const cookieStore = await cookies();
+  const userEmail = cookieStore.get('aivar_user_email')?.value || 'auto@aivar.test';
+
   const project = await prisma.project.findFirst({
+    where: { user: { email: userEmail } },
     orderBy: { createdAt: 'desc' }
   });
 

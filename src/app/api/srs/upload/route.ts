@@ -50,11 +50,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to extract text from document' }, { status: 400 })
     }
 
-    // Ensure we have a mock user since Auth isn't fully wired to DB
-    let user = await prisma.user.findFirst()
+    // Get user from cookie
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    const userEmail = cookieStore.get('aivar_user_email')?.value || 'auto@aivar.test'
+    
+    let user = await prisma.user.findUnique({ where: { email: userEmail } })
     if (!user) {
       user = await prisma.user.create({
-        data: { email: 'auto@aivar.test', name: 'Auto User' }
+        data: { email: userEmail, name: userEmail.split('@')[0] }
       })
     }
 

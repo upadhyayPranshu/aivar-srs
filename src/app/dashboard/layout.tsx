@@ -1,11 +1,16 @@
 import Link from "next/link"
-import { BrainCircuit, LayoutDashboard, FolderKanban, FileText, ListTodo, ShieldAlert, AlertTriangle, GitBranch, Share2, ClipboardCheck, Calculator, GitCompare, MessageSquareCode, Settings, UploadCloud } from "lucide-react"
+import { BrainCircuit, LayoutDashboard, FolderKanban, FileText, ListTodo, ShieldAlert, AlertTriangle, GitBranch, Share2, ClipboardCheck, Calculator, GitCompare, MessageSquareCode, Settings, UploadCloud, User } from "lucide-react"
+import LogoutButton from "@/components/LogoutButton"
+import { cookies } from "next/headers"
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const cookieStore = await cookies()
+  const userEmail = cookieStore.get('aivar_user_email')?.value || 'Guest'
+
   return (
     <div className="flex min-h-screen bg-muted/20">
       {/* Sidebar */}
@@ -64,9 +69,13 @@ export default function DashboardLayout({
         <header className="h-16 flex items-center justify-between border-b border-border bg-background px-6 shrink-0">
           <h2 className="font-semibold text-lg">Project Name</h2>
           <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              U
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground truncate max-w-[120px]">
+                {userEmail}
+              </span>
             </div>
+            <LogoutButton />
           </div>
         </header>
         <div className="flex-1 overflow-auto p-6">

@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { FileText, GitMerge, ShieldAlert, CheckCircle, Activity, Box } from "lucide-react"
@@ -7,7 +8,11 @@ import PrintButton from "@/components/PrintButton"
 export const instant = false
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const userEmail = cookieStore.get('aivar_user_email')?.value || 'auto@aivar.test';
+
   const project = await prisma.project.findFirst({
+    where: { user: { email: userEmail } },
     include: {
       requirements: true,
       validationReports: true,
