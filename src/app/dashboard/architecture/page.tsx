@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import prisma from "@/lib/db/prisma"
-import MermaidDiagram from "@/components/architecture/MermaidDiagram"
+import InteractiveArchitecture from "@/components/architecture/InteractiveArchitecture"
 export const instant = false
 
 export default async function ArchitecturePage() {
@@ -35,10 +35,11 @@ export default async function ArchitecturePage() {
       ) : (
         <div className="space-y-8">
           {project.architectureModels.map((model) => (
-            <div key={model.id} className="space-y-4">
-              <h2 className="text-xl font-semibold capitalize">{model.type.replace('_', ' ').toLowerCase()} Diagram</h2>
-              <MermaidDiagram chart={model.content} />
-            </div>
+            <InteractiveArchitecture 
+              key={model.id}
+              title={`${model.type.replace('_', ' ').toLowerCase()} Diagram`}
+              initialChart={model.content} 
+            />
           ))}
         </div>
       )}

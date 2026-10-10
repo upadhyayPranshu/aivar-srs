@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import prisma from "@/lib/db/prisma"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import ExportCsvButton from "@/components/ExportCsvButton"
 export const instant = false
 
 export default async function RequirementsPage() {
@@ -26,11 +27,14 @@ export default async function RequirementsPage() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Requirements</h1>
-        <p className="text-muted-foreground mt-2">
-          Extracted software requirements from your SRS document.
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Requirements</h1>
+          <p className="text-muted-foreground mt-2">
+            Extracted software requirements from your SRS document.
+          </p>
+        </div>
+        <ExportCsvButton data={project.requirements} />
       </div>
 
       <div className="rounded-md border bg-background">
