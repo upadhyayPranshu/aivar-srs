@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import prisma from "@/lib/db/prisma"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import ExportCsvButton from "@/components/ExportCsvButton"
+import ExportDataButton from "@/components/ExportDataButton"
 export const instant = false
 
 export default async function RequirementsPage() {
@@ -34,7 +34,18 @@ export default async function RequirementsPage() {
             Extracted software requirements from your SRS document.
           </p>
         </div>
-        <ExportCsvButton data={project.requirements} />
+        <ExportDataButton 
+          data={project.requirements} 
+          filename="requirements_export.csv"
+          columns={[
+            { header: "ID", key: "reqId" },
+            { header: "Description", key: "text" },
+            { header: "Type", key: "type" },
+            { header: "Priority", key: "priority" },
+            { header: "Risk Level", key: "riskLevel" },
+            { header: "Quality Score", key: "ambiguityScore" } // simplified proxy for now
+          ]}
+        />
       </div>
 
       <div className="rounded-md border bg-background">
