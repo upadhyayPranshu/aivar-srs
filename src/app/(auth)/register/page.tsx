@@ -30,8 +30,7 @@ export default function RegisterPage() {
         setLoading(false)
         return
       }
-      router.push('/dashboard')
-      router.refresh()
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || 'Failed to register. Please try again.')
       setLoading(false)

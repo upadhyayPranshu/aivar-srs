@@ -29,8 +29,7 @@ export default function LoginPage() {
         setLoading(false)
         return
       }
-      router.push('/dashboard')
-      router.refresh()
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || 'Failed to login. Please try again.')
       setLoading(false)

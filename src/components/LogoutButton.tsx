@@ -9,8 +9,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
-    router.refresh()
+    window.location.href = '/login'
   }
 
   return (
